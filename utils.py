@@ -24,3 +24,17 @@ def split_sentences(text):
     sentences = nltk.tokenize.sent_tokenize(text)
     sentences = [sent for sent in sentences if len(sent)>10]
     return sentences
+
+# calculate fairness
+def fairness(rank, relevance):
+    rank = np.array(rank)
+    numQ, numD = rank.shape
+    # Document-side exposure
+    exposure = np.zeros(numD)
+    for i in range(numD):
+        exposure[rank[:,i]] += 1/(i+1)
+    exposure = exposure / np.sum(exposure)
+    relevance = np.sum(relevance, axis = 0)
+    relevance = relevance / np.sum(relevance)
+    fairness = np.sqrt(np.sum(exposure**2 - relevance**2))
+    return fairness
